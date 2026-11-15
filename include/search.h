@@ -98,7 +98,7 @@ std::vector<Node<State, Action>*> expand(const Problem<State, Action>& problem, 
 template <typename State, typename Action>
 Node<State, Action>* breadthFirstSearch(const Problem<State, Action>& problem, std::chrono::duration<double>& time_elapsed)
 {
-    auto start = problem.getStart();
+    State start = problem.getStart();
     std::queue<Node<State, Action>*> frontier;
     std::unordered_set<State> visited;
 
@@ -135,9 +135,42 @@ Node<State, Action>* breadthFirstSearch(const Problem<State, Action>& problem, s
 }
 
 template <typename State, typename Action>
-Node<State, Action>* depthLimitedSearch(const Problem<State, Action>& problem, const long long depth_limit, const std::chrono::time_point<std::chrono::steady_clock> time_start)
+Node<State, Action>* depthFirstSearch(const Problem<State, Action>& problem, std::chrono::duration<double>& time_elapsed)
 {
-    auto start = problem.getStart();
+    State start = problem.getStart();
+    std::stack<Node<State, Action>*> frontier{};
+
+    auto* curr = NodeCollector<State, Action>::createNode(start, 0, 0, 0, nullptr, Action{});
+    frontier.push(curr);
+
+    auto time_start = std::chrono::steady_clock::now();
+    while(!frontier.empty()){
+        auto time_now = std::chrono::steady_clock::now();
+        time_elapsed = time_now - time_start;
+
+        if (time_elapsed.count() > TIME_LIMIT)
+            return nullptr;
+
+        curr = frontier.top();
+        frontier.pop();
+
+        if(problem.isGoal(curr->state))
+            return curr;
+
+        if(!isCycle(problem, curr)){
+            for(auto child : expand(problem, curr)){
+                frontier.push(child);
+            }
+        }
+    }
+    return nullptr;
+}
+
+template <typename State, typename Action>
+Node<State, Action>* depthLimitedSearch(const Problem<State, Action>& problem, const long long depth_limit,
+    const std::chrono::time_point<std::chrono::steady_clock> time_start)
+{
+    State start = problem.getStart();
     std::stack<Node<State, Action>*> frontier{};
 
     auto* curr = NodeCollector<State, Action>::createNode(start, 0, 0, 0, nullptr, Action{});
@@ -196,7 +229,7 @@ Node<State, Action>* informedSearch(const Problem<State, Action>& problem, std::
     std::priority_queue<Node<State, Action>*, std::vector<Node<State, Action>*>, decltype(cmp)>frontier(cmp);
 
     std::unordered_map<State, Node<State, Action>*> visited;
-    auto start = problem.getStart();
+    State start = problem.getStart();
     auto* curr = NodeCollector<State, Action>::createNode(start, 0, problem.heuristic(start), problem.heuristic(start), nullptr, Action{});
     frontier.push(curr);
     visited.insert({ curr->state, curr });

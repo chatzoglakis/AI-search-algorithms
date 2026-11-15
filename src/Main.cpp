@@ -89,6 +89,10 @@ int main(int argc, char* argv[])
     }
     else if (method == "depth") {
         std::cout << "Solving problem using depth first search...\n";
+        solution = depthFirstSearch(problem, time_elapsed);
+    }
+    else if (method == "iterativeDeepening"){
+        std::cout << "Solving problem using iterative deepening search...\n";
         solution = iterativeDeepeningSearch(problem, time_elapsed);
     }
     else if (method == "best") {
