@@ -224,7 +224,7 @@ Node<State, Action>* iterativeDeepeningSearch(const Problem<State, Action>& prob
 }
 
 template <typename State, typename Action>
-Node<State, Action>* informedSearch(const Problem<State, Action>& problem, std::function<bool(Node<State, Action>*, Node<State, Action>*)> cmp, std::chrono::duration<double>& time_elapsed)
+static Node<State, Action>* informedSearch(const Problem<State, Action>& problem, std::function<bool(Node<State, Action>*, Node<State, Action>*)> cmp, std::chrono::duration<double>& time_elapsed)
 {
     std::priority_queue<Node<State, Action>*, std::vector<Node<State, Action>*>, decltype(cmp)>frontier(cmp);
 
@@ -275,5 +275,11 @@ Node<State, Action>* aStar(const Problem<State, Action>& problem, std::chrono::d
 {
 
     std::function<bool(Node<State, Action>*, Node<State, Action>*)> cmp = [](Node<State, Action>* a, Node<State, Action>* b) {return a->f > b->f; };
+    return informedSearch(problem, cmp, time_elapsed);
+}
+
+template <typename State, typename Action>
+Node<State, Action>* uniformCostSearch(const Problem<State, Action>& problem, std::chrono::duration<double>& time_elapsed){
+    std::function<bool(Node<State, Action>*, Node<State, Action>*)>  cmp = [](Node<State, Action>* a, Node<State, Action>* b) {return a->g > b->g; };
     return informedSearch(problem, cmp, time_elapsed);
 }

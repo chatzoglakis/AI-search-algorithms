@@ -95,6 +95,10 @@ int main(int argc, char* argv[])
         std::cout << "Solving problem using iterative deepening search...\n";
         solution = iterativeDeepeningSearch(problem, time_elapsed);
     }
+    else if (method == "uniformCost"){
+        std::cout << "Solving problem using uniform cost search...\n";
+        solution = uniformCostSearch(problem, time_elapsed);
+    }
     else if (method == "best") {
         std::cout << "Solving problem using best first search...\n";
         solution = bestFirstSearch(problem, time_elapsed);
